@@ -5,9 +5,9 @@ describe('User Route',()=>{
   describe('POST /api/users/system-admin', () => {
     it('should create a new system user and return with role', async () => {
       const newUser = {
-        firstname: 'Priya1111',
-        lastname: 'Intwala2222',
-        email: 'priyaintwala3333@bacancy.com',
+        firstname: 'Priya2112',
+        lastname: 'Intwala112',
+        email: 'priyaintwala312@bacancy.com',
       };
   
       const response = await request(BASE_URL)
@@ -78,9 +78,9 @@ describe('User Route',()=>{
     });
   
     const newUser = {
-      firstname: 'Priy',
-      lastname: 'Intwal',
-      email: 'priyaintwal@bacancy.com',
+      firstname: 'Priyaa',
+      lastname: 'Intwalaa',
+      email: 'priyaintwalaa@bacancy.com',
     }
     let userId: string 
     describe('POST /api/users', () => {
@@ -108,6 +108,16 @@ describe('User Route',()=>{
         expect(response.body.data).toHaveProperty('lastname', newUser.lastname);
         expect(response.body.data).toHaveProperty('email', newUser.email);
       });
+      
+      it('should return an error when the user ID does not exist', async () => {
+        const nonExistentUserId = 'invalid-user-id';
+        const response = await request(BASE_URL)
+          .get(`/api/users/${nonExistentUserId}`)
+           // or any other appropriate HTTP status code
+    
+        expect(response.body).toHaveProperty('success', false);
+        // Add any other expectations based on your API's error response structure
+      });
     });
   
     describe('PUT /api/users/:id', () => {
@@ -129,6 +139,23 @@ describe('User Route',()=>{
         expect(response.body.data).toHaveProperty('lastname', updatedUser.lastname);
         expect(response.body.data).toHaveProperty('email', updatedUser.email);
       });
+
+      it('should return an error when the user ID does not exist', async () => {
+        const nonExistentUserId = 'invalid-user-id';
+        const updatedUser = {
+          firstname: 'Jane',
+          lastname: 'Smith',
+          email: 'janesmith@example.com',
+        };
+    
+        const response = await request(BASE_URL)
+          .put(`/api/users/${nonExistentUserId}`)
+          .send(updatedUser)
+           // or any other appropriate HTTP status code
+    
+        expect(response.body).toHaveProperty('success', false);
+        // Add any other expectations based on your API's error response structure
+      });
     });
   
     describe('DELETE /api/users/:id', () => {
@@ -140,7 +167,16 @@ describe('User Route',()=>{
         expect(response.body).toHaveProperty('success', true);
         expect(response.body).toHaveProperty('message', 'User deleted succesfully');
       });
+      it('should return an error when the user ID does not exist', async () => {
+        const nonExistentUserId = 'invalid-user-id';
+    
+        const response = await request(BASE_URL)
+          .delete(`/api/users/${nonExistentUserId}`)
+           // or any other appropriate HTTP status code
+    
+        expect(response.body).toHaveProperty('success', true);
+        // Add any other expectations based on your API's error response structure
+      });
     });
   });
 })
-
