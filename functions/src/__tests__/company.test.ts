@@ -1,11 +1,11 @@
-// import supertest from 'supertest';
+import supertest from 'supertest';
 // // import app from '../app.js';
 // import { Roles } from '../constants/enums.js';
 // import {CompanyController} from '../controllers/company.controller.js';
 // import {
 //     verfiyRole,
 // } from "../middlewares/auth.middleware.js";
-// const BASE_URL = 'http://127.0.0.1:5001/woundbio/us-central1/wb'
+const BASE_URL = 'http://127.0.0.1:5001/woundbio/us-central1/wb'
 // import { Request, Response } from "express";
 
 // const mockRoles = {
@@ -14,6 +14,24 @@
 //     }
 // }
 
+// describe('Company Controller', () => {
+//     let companyId: string;
+//     it('create a new company and check the role ', async () => {
+//         const req = { user: { role: 'superadmin' }, body: { name: 'My first test' } }
+//         const next = (err: Error) => expect(err).toBeFalsy()
+
+//         const response =
+//             await supertest(BASE_URL).post('/api/companies')
+//                 .set('x-api-key', process.env.SYSTEM_ADMIN_KEY)
+//                 // .set(req.user.role, 'superadmin')
+//                 .send(req.body)
+//                 .expect(200)
+
+//         expect(response.body).toHaveProperty('success', true);
+//         expect(response.body.data).toHaveProperty('id');
+//         companyId = response.body.data.id;
+//     })
+// })
 // describe('Company Routes', () => {
 //   let companyId: string;
 //   let userId: string;
@@ -29,7 +47,7 @@
 //         const newCompany = {
 //             name: 'Test Company two',
 //           };
-    
+
 //           // Mock the request object
 //           const req = {
 //             body: newCompany,
@@ -37,22 +55,22 @@
 //               role: Roles.SYSTEM_ADMIN, // Set an unauthorized role
 //             },
 //           } as unknown as Request;
-    
+
 //           // Mock the response object
 //           const res = {
 //             status: jest.fn().mockReturnThis(),
 //             json: jest.fn(),
 //           } as unknown as Response;
-    
+
 //           // Mock the next function
 //           const next = jest.fn();
-    
+
 //           // Call the verifyRole middleware
 //           verfiyRole([Roles.SYSTEM_ADMIN])(req, res, next);
-    
+
 //           // Call the createCompany controller
 //           await CompanyController.createCompany(req, res);
-      
+
 
 //       const response = await supertest(BASE_URL)
 //         .post('/api/companies')
@@ -182,6 +200,6 @@
 
 describe('Example test', () => {
     it('should pass', () => {
-      expect(true).toBe(true);
+        expect(true).toBe(true);
     });
-  });
+});

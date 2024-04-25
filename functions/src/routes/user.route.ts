@@ -14,8 +14,8 @@ userRouter.post(
     validateData(userRegistrationSchema),
     userController.createSystemAdmin
 );
-userRouter.use(verifyToken);
-userRouter.use(verfiyRole([Roles.SYSTEM_ADMIN]));
+// userRouter.use(verifyToken);
+// userRouter.use(verfiyRole([Roles.SYSTEM_ADMIN]));
 userRouter.get("/:id", userController.getUser);
 //Create users from system admin's account, need to restrict
 userRouter.post(

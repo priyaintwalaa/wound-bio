@@ -12,7 +12,7 @@
         "deploy": "firebase deploy --only functions",
         "logs": "firebase functions:log",
         "test": "cross-env SYSTEM_ADMIN_KEY=sdf5ds4f5122 jest",
-        "test:watch": "jest --watch"
+        "test:watch": "jest --watch "
     },
     "type": "module",
     "engines": {

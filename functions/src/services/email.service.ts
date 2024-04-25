@@ -29,6 +29,7 @@ export default class EmailService {
 
     sendMail = async (mailOptions: Mail.Options) => {
         try {
+            console.log(process.env.FROM_EMAIL);
             mailOptions.from = process.env.FROM_EMAIL;
             await transporter.sendMail(mailOptions);
         } catch (err: any) {

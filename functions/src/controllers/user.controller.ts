@@ -6,6 +6,7 @@ import CustomResponse from "../models/customResponse.js";
 import { UserMapper } from "../mappers/user.mapper.js";
 import CustomError from "../models/customError.js";
 import asyncHandler from "../utils/catchAsync.util.js";
+import { createLogicalAnd } from "typescript";
 
 export class UserController {
     private userService: UserService;
@@ -42,6 +43,7 @@ export class UserController {
 
     createSystemAdmin = asyncHandler(async (req: Request, res: Response) => {
         //Step1: Allow only if have valid API key to create system admin
+        console.log(req.body, "createSystemAdmin");
         if (req.headers["x-api-key"] != process.env.SYSTEM_ADMIN_KEY) {
             throw new CustomError("Unauthorized", 401);
         }

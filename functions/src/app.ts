@@ -6,7 +6,7 @@ import CustomError from "./models/customError.js";
 import errorHandler from "./middlewares/error.middleware.js";
 // const __dirname = path.resolve();
 import swaggerUi from "swagger-ui-express";
-import swaggerDocument from "../swagger.json" 
+// import swaggerDocument from "../swagger.json" 
 // assert { type: "json" }; // Adjust the path to your Swagger JSON file
 
 const app: Express = express();
@@ -14,7 +14,7 @@ const app: Express = express();
 app.use(cors());
 app.use(express.json());
 // app.use(express.static(path.join(__dirname, "build")));
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+// app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use("/api/", indexRouter);
 
