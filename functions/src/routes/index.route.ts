@@ -10,6 +10,7 @@ import patientRouter from "./patient.route.js";
 
 const indexRouter: Router = express.Router();
 
+console.log("in router")
 indexRouter.use("/auth", authRouter);
 indexRouter.use("/users", userRouter);
 indexRouter.use(verifyToken);
