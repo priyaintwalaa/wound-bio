@@ -14,6 +14,7 @@ export function verifyToken(
     const authHeader = req.header("Authorization");
     console.log(authHeader,"verifyToken");
     if (!authHeader) return next(new CustomError("Unauthorized", 401));
+
     // Split header and check format
     const parts = authHeader.split(" ");
     if (parts.length !== 2 || parts[0].toLowerCase() !== "bearer") {
@@ -47,6 +48,7 @@ export function verfiyRole(expectedRole: string[]) {
         next: NextFunction
     ) {
         console.log('in verify role')
+        console.log(req.user.role)
         if (expectedRole.includes(req.user.role)) next();
         else next(new CustomError("Unauthorized", 401));
     };
