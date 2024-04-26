@@ -16,6 +16,7 @@ app.use(express.json());
 // app.use(express.static(path.join(__dirname, "build")));
 // app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
+console.log("main router")
 app.use("/api/", indexRouter);
 
 // app.get("/logger", (_, res) => {

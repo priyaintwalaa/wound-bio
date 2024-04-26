@@ -28,8 +28,9 @@ export class CompanyController {
     });
 
     getCompany = asyncHandler(async (req: Request, res: Response) => {
+        console.log(req.params,"req.params")
         const company: Company = await this.companyService.getCompnayById(
-            req.params.id
+            req.params.companyId
         );
         // const userMapper = new UserMapper();
         // const userResponse = userMapper.generateUserResponse(company);

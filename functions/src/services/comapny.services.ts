@@ -1,3 +1,4 @@
+import { createLogicalAnd } from "typescript";
 import { firebaseDB } from "../config/firebase.config.js";
 import { FIREBASE_CONSTANTS } from "../constants/firebase.js";
 import { Company } from "../models/company.js";
@@ -11,6 +12,8 @@ export default class CompanyService {
     constructor() {}
 
     getCompnayById = async (userId: string) => {
+        console.log(userId, "getCompany.id")
+        console.log(typeof userId)
         const docRef = companiesCollection.doc(userId);
         const doc = await docRef.get();
         if (!doc.exists) {

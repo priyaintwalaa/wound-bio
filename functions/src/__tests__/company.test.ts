@@ -288,6 +288,7 @@ describe('company', () => {
 
     expect(res.body).toHaveProperty('success', true)
     token = res.body.data.token
+    userId = res.body.data.user.id
 
     const companyData = await request(BASE_URL)
       .post('/api/companies')
@@ -298,16 +299,8 @@ describe('company', () => {
     expect(companyData.body).toHaveProperty('success', true)
     expect(companyData.body.data).toHaveProperty('id')
     companyId = companyData.body.data.id
+   
   }, 20000)
-
-  it('should get a company by ID', async () => {
-    const response = await request(BASE_URL)
-      .get(`/api/companies/${companyId}`)
-      .set('Authorization', `Bearer ${token}`)
-      .expect(200);
-
-    expect(response.body).toHaveProperty('success', true);
-  });
 
   it('should update a company', async () => {
     const updatedCompany = {
@@ -333,10 +326,11 @@ describe('company', () => {
     expect(response.body).toHaveProperty('success', true);
   });
 
+   
 
   it('should create a new company user POST /api/companies/:companyId/users', async () => {
     const companyName = {
-      name: "yaah haa"
+      name: "yupppiiii"
     }
     const companyData = await request(BASE_URL)
       .post('/api/companies')
@@ -344,13 +338,23 @@ describe('company', () => {
       .send(companyName)
       .expect(200)
 
-    expect(companyData.body).toHaveProperty('success', true)
     expect(companyData.body.data).toHaveProperty('id')
     companyId = companyData.body.data.id
+
+    const userUpdate = await request(BASE_URL)
+    .put(`/api/users/${userId}`)
+    .set('Authorization', `Bearer ${token}`)
+    .send({companyId})
+    .expect(200)
+
+    expect(userUpdate.body).toHaveProperty('success', true);
+
     const newUser = {
       firstname: 'John',
       lastname: 'Doe',
-      email: 'johndoe@example.com',
+      email: 'doeeJohnn@example.com',
+      companyId,
+      role:'companyadmin'
     };
 
     const response = await request(BASE_URL)
@@ -364,12 +368,21 @@ describe('company', () => {
     userId = response.body.data.user.id;
   });
 
+  it('should get a company by ID', async () => {
+    const response = await request(BASE_URL)
+      .get(`/api/companies/${companyId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+
+    expect(response.body).toHaveProperty('success', true);
+  });
+
 
   it('should update a company user /api/companies/:companyId/users/:userId', async () => {
     const updatedUser = {
       firstname: 'Jane',
       lastname: 'Smith',
-      email: 'janesmith@example.com',
+      email: 'SmiithennJanee@example.com',
     };
 
     const response = await request(BASE_URL)
