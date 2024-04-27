@@ -28,7 +28,7 @@ export class CompanyController {
     });
 
     getCompany = asyncHandler(async (req: Request, res: Response) => {
-        console.log(req.params,"req.params")
+        console.log(req.params,"req.params");
         const company: Company = await this.companyService.getCompnayById(
             req.params.companyId
         );
@@ -61,6 +61,7 @@ export class CompanyController {
         const user: User = req.body;
         user.companyId = req.params.companyId;
         const { id, password } = await this.userService.createUser(user);
+        console.log(id,"id");
         user.id = id;
         await this.userService.sendCredsEmailToUser({
             firstname: user.firstname,
@@ -68,6 +69,7 @@ export class CompanyController {
             toEmailAddress: user.email,
             password,
         });
+        console.log("hello");
         const userMapper = new UserMapper();
         const userResponse = userMapper.generateUserResponse(user);
         return res.status(200).json(

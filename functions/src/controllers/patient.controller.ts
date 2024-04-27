@@ -36,7 +36,7 @@ export class PatientController {
 
     updatePatient = asyncHandler(async (req: Request, res: Response) => {
         const patient = req.body;
-        patient.id = req.params.patientId;
+        patient.id = req.params.id;
         await this.patientService.updatePatient(patient);
         return res
             .status(200)
@@ -44,7 +44,7 @@ export class PatientController {
     });
 
     deletePatient = asyncHandler(async (req: Request, res: Response) => {
-        const { patientId } = req.params;
+        const  patientId  = req.params.id;
         await this.patientService.deletePatient(patientId);
         return res
             .status(200)

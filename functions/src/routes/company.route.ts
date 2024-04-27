@@ -11,7 +11,6 @@ import { validateData } from "../middlewares/validation.middleware.js";
 const companyRouter: Router = express.Router();
 const companyController: CompanyController = new CompanyController();
 
-console.log("company router")
 companyRouter.post(
     "/",
     verfiyRole([Roles.SYSTEM_ADMIN]),
