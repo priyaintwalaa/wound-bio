@@ -1,18 +1,17 @@
 import request from "supertest";
 const BASE_URL = "http://127.0.0.1:5001/fir-functions-9c002/us-central1/wb";
+// import { SuperAdminToken as token } from "./users.test.js";
+// import { userIdSuperAdmin as userIdSuperAdmin } from "./users.test.js";
 
-export let token: string;
 export let companyId: string;
-let userIdSuperAdmin: string;
+export let token: string;
 let userIdComapnyAdmin: string;
+let userIdSuperAdmin: string;
 describe("company API ", () => {
-    it("return token for a valid user and create company", async () => {
-        const companyName = {
-            name: "hello1",
-        };
+    beforeAll(async()=>{
         const loginData = {
             email: "hello@bacancy.com",
-            password: "dc58d3a5a3",
+            password: "0353ae0fa3",
         };
 
         const res = await request(BASE_URL)
@@ -23,7 +22,12 @@ describe("company API ", () => {
         expect(res.body).toHaveProperty("success", true);
         token = res.body.data.token;
         userIdSuperAdmin = res.body.data.user.id;
-
+    });
+    it("return token for a valid user and create company", async () => {
+        const companyName = {
+            name: "Premium",
+        };
+    
         const companyData = await request(BASE_URL)
             .post("/api/companies")
             .set("Authorization", `Bearer ${token}`)
@@ -37,7 +41,7 @@ describe("company API ", () => {
 
     it("should update a company", async () => {
         const updatedCompany = {
-            name: "Updated Test Company 1",
+            name: "Updated Test Company",
         };
 
         const response = await request(BASE_URL)
@@ -61,9 +65,9 @@ describe("Company Users", () => {
         expect(userUpdate.body).toHaveProperty("success", true);
 
         const newUser = {
-            firstname: "John",
+            firstname: "Premium",
             lastname: "Doe",
-            email: "qwert@example.com",
+            email: "preminum@gmail.com",
             companyId,
             role: "companyadmin",
         };
@@ -92,7 +96,7 @@ describe("Company Users", () => {
         const updatedUser = {
             firstname: "Jane",
             lastname: "Smith",
-            email: "SmitgreatJanee@example.com",
+            email: "PremiumGandhi@example.com",
         };
 
         const response = await request(BASE_URL)
@@ -112,9 +116,7 @@ describe("Company Users", () => {
 
         expect(response.body).toHaveProperty("success", true);
     });
-});
 
-describe("deletes company", () => {
     it("should delete a company", async () => {
         const response = await request(BASE_URL)
             .delete(`/api/companies/${companyId}`)
@@ -124,6 +126,7 @@ describe("deletes company", () => {
         expect(response.body).toHaveProperty("success", true);
     }, 20000);
 });
+
 describe("Example test", () => {
     it("should pass", () => {
         expect(true).toBe(true);
