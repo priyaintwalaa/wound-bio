@@ -20,6 +20,7 @@
     },
     "main": "dist/src/index.js",
     "dependencies": {
+        "@jest/test-sequencer": "^29.7.0",
         "@types/nodemailer": "^6.4.14",
         "cors": "^2.8.5",
         "cross-env": "^7.0.3",

@@ -6,7 +6,6 @@ import CustomResponse from "../models/customResponse.js";
 import { UserMapper } from "../mappers/user.mapper.js";
 import CustomError from "../models/customError.js";
 import asyncHandler from "../utils/catchAsync.util.js";
-import { createLogicalAnd } from "typescript";
 
 export class UserController {
     private userService: UserService;

@@ -12,7 +12,7 @@ export function verifyToken(
     next: NextFunction
 ) {
     const authHeader = req.header("Authorization");
-    console.log(authHeader,"verifyToken");
+    console.log(authHeader, "verifyToken");
     if (!authHeader) return next(new CustomError("Unauthorized", 401));
 
     // Split header and check format
@@ -47,8 +47,8 @@ export function verfiyRole(expectedRole: string[]) {
         res: Response,
         next: NextFunction
     ) {
-        console.log('in verify role')
-        console.log(req.user.role)
+        console.log("in verify role");
+        console.log(req.user.role);
         if (expectedRole.includes(req.user.role)) next();
         else next(new CustomError("Unauthorized", 401));
     };
@@ -77,7 +77,7 @@ export const isCompanyAdmin = async (
 export const isSystemAdminOrCompanyAdmin = async (
     req: ExtendedExpressRequest,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
 ) => {
     try {
         if (
@@ -85,6 +85,8 @@ export const isSystemAdminOrCompanyAdmin = async (
                 req.user.role == Roles.COMPANY_ADMIN) ||
             req.user.role == Roles.SYSTEM_ADMIN
         ) {
+            console.log("in if");
+            
             next();
         } else {
             next(new CustomError("Unauthorized", 401));

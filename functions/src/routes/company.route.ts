@@ -7,6 +7,8 @@ import {
 import { Roles } from "../constants/enums.js";
 import { comapanyUserSchema } from "../schemas/zod.schema.js";
 import { validateData } from "../middlewares/validation.middleware.js";
+import { NextFunction, Response } from "express";
+import { ExtendedExpressRequest } from "../models/extendedExpressRequest.js";
 
 const companyRouter: Router = express.Router();
 const companyController: CompanyController = new CompanyController();
@@ -26,7 +28,12 @@ companyRouter.delete(
     verfiyRole([Roles.SYSTEM_ADMIN]),
     companyController.deleteCompany
 );
-companyRouter.use(isSystemAdminOrCompanyAdmin);
+// companyRouter.use(isSystemAdminOrCompanyAdmin);
+companyRouter.param("companyId",
+    (req: ExtendedExpressRequest, res: Response, next: NextFunction) => {
+        isSystemAdminOrCompanyAdmin(req, res, next);
+    }
+);
 companyRouter.get("/:companyId", companyController.getCompany);
 companyRouter.post(
     "/:companyId/users",

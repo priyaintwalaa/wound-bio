@@ -10,7 +10,7 @@ let UserToken:string;
 //     beforeAll(async () => {
 //         const loginData = {
 //             email: "hello@bacancy.com",
-//             password: "0353ae0fa3",
+//             password: "72f688e9b9",
 //         };
 
 //         const res = await request(BASE_URL)

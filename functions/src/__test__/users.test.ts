@@ -4,14 +4,15 @@ const BASE_URL = "http://127.0.0.1:5001/fir-functions-9c002/us-central1/wb";
 const adminKey = process.env.SYSTEM_ADMIN_KEY;
 // // import { token as SuperAdminToken} from "./company.test.js";
 
-let SuperAdminToken: string;
-// let userIdSuperAdmin: string;
+export let SuperAdminToken: string;
+export let userIdSuperadmin: string;
+
 let userId: string;
 describe("POST api for all /api/users", () => {
     beforeAll(async () => {
         const loginData = {
             email: "hello@bacancy.com",
-            password: "0353ae0fa3",
+            password: "72c20ad0b4",
         };
 
         const res = await request(BASE_URL)
@@ -21,13 +22,13 @@ describe("POST api for all /api/users", () => {
 
         expect(res.body).toHaveProperty("success", true);
         SuperAdminToken = res.body.data.token;
-        // userIdSuperAdmin = res.body.data.user.id;
+        userIdSuperadmin = res.body.data.user.id;
     });
     it("should create a new system user and return with role", async () => {
         const nUser = {
             firstname: "heell",
             lastname: "heell",
-            email: "firstSuper@bacancy.com"
+            email: "firstSuperrr@bacancy.com"
         };
 
         const response = await request(BASE_URL)

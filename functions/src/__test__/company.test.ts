@@ -1,17 +1,20 @@
 import request from "supertest";
 const BASE_URL = "http://127.0.0.1:5001/fir-functions-9c002/us-central1/wb";
 // import { SuperAdminToken as token } from "./users.test.js";
-// import { userIdSuperAdmin as userIdSuperAdmin } from "./users.test.js";
+// import { userIdSuperadmin as userIdSuperAdmin } from "./users.test.js";
 
 export let companyId: string;
 export let token: string;
 let userIdComapnyAdmin: string;
-let userIdSuperAdmin: string;
+let companyToken: string;
+let companyIdAdmin:string;
+let UserCompanyId:string;
+// let userIdSuperAdmin: string;
 describe("company API ", () => {
     beforeAll(async()=>{
         const loginData = {
             email: "hello@bacancy.com",
-            password: "0353ae0fa3",
+            password: "72c20ad0b4",
         };
 
         const res = await request(BASE_URL)
@@ -21,7 +24,6 @@ describe("company API ", () => {
 
         expect(res.body).toHaveProperty("success", true);
         token = res.body.data.token;
-        userIdSuperAdmin = res.body.data.user.id;
     });
     it("return token for a valid user and create company", async () => {
         const companyName = {
@@ -56,13 +58,6 @@ describe("company API ", () => {
 
 describe("Company Users", () => {
     it("should create a new company user POST /api/companies/:companyId/users", async () => {
-        const userUpdate = await request(BASE_URL)
-            .put(`/api/users/${userIdSuperAdmin}`)
-            .set("Authorization", `Bearer ${token}`)
-            .send({ companyId })
-            .expect(200);
-
-        expect(userUpdate.body).toHaveProperty("success", true);
 
         const newUser = {
             firstname: "Premium",
@@ -71,7 +66,6 @@ describe("Company Users", () => {
             companyId,
             role: "companyadmin",
         };
-
         const response = await request(BASE_URL)
             .post(`/api/companies/${companyId}/users`)
             .set("Authorization", `Bearer ${token}`)
@@ -126,6 +120,81 @@ describe("Company Users", () => {
         expect(response.body).toHaveProperty("success", true);
     }, 20000);
 });
+
+describe("Company Users with companyAdmin",()=>{
+    beforeAll(async()=>{
+        const loginData = {
+            email:"johndowswee@example.com",
+            password:"4ba1d6723e",
+        };
+
+        const res = await request(BASE_URL)
+            .post("/api/auth/login")
+            .send(loginData)
+            .expect(200);
+
+        expect(res.body).toHaveProperty("success", true);
+        
+        companyToken = res.body.data.token;
+        companyIdAdmin = res.body.data.user.companyId;
+        // UserCompanyId = res.body.data.user.id;
+    });
+
+    it("should create a new company user POST /api/companies/:companyId/users", async () => {
+        const newUser = {
+            firstname: "Premium",
+            lastname: "Doe",
+            email: "companyuser@gmail.com",
+            companyIdAdmin,
+            role: "user",
+        };
+        const response = await request(BASE_URL)
+            .post(`/api/companies/${companyIdAdmin}/users`)
+            .set("Authorization", `Bearer ${companyToken}`)
+            .send(newUser)
+            .expect(200);
+
+        expect(response.body).toHaveProperty("success", true);
+        expect(response.body.data.user).toHaveProperty("id");
+        // userIdComapnyAdmin = response.body.data.user.id;
+        UserCompanyId = response.body.data.user.id;
+    }, 20000);
+
+    it("should get a company by ID", async () => {
+        const response = await request(BASE_URL)
+            .get(`/api/companies/${companyIdAdmin}`)
+            .set("Authorization", `Bearer ${companyToken}`)
+            .expect(200);
+
+        expect(response.body).toHaveProperty("success", true);
+    });
+
+    it("should update a company user /api/companies/:companyId/users/:userId", async () => {
+        const updatedUser = {
+            firstname: "Jane",
+            lastname: "Smith",
+            email: "PremiumGandhi@example.com",
+        };
+
+        const response = await request(BASE_URL)
+            .put(`/api/companies/${companyIdAdmin}/users/${UserCompanyId}`)
+            .set("Authorization", `Bearer ${companyToken}`)
+            .send(updatedUser)
+            .expect(200);
+
+        expect(response.body).toHaveProperty("success", true);
+    });
+
+    it("should delete a company user DELETE /api/companies/:companyId/users/:userId", async () => {
+        const response = await request(BASE_URL)
+            .delete(`/api/companies/${companyIdAdmin}/users/${UserCompanyId}`)
+            .set("Authorization", `Bearer ${companyToken}`)
+            .expect(200);
+
+        expect(response.body).toHaveProperty("success", true);
+    });
+});
+
 
 describe("Example test", () => {
     it("should pass", () => {
