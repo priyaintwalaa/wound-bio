@@ -144,6 +144,71 @@ describe("Product Routes", () => {
     });
 });
 
+describe("Invalid Token",()=>{
+    const invalidToken = "invalid-token";
+    it("it should create a new manufacturer should response UnAuthorized with invalid token", async () => {
+        const manufacturerCreate = await request(BASE_URL)
+            .post("/api/manufacturers")
+            .set("Authorization", `Bearer ${invalidToken}`)
+            .send({ name: "cettemol" })
+            .expect(401);
+
+        expect(manufacturerCreate.body).toHaveProperty("success", false);
+    });
+
+    it("update the manufacturer should response UnAuthorized with invalid token", async () => {
+        const manufacturerUpdate = await request(BASE_URL)
+            .put(`/api/manufacturers/${manufacturerId}`)
+            .set("Authorization", `Bearer ${invalidToken}`)
+            .send({ name: "paracettemol" })
+            .expect(200);
+
+        expect(manufacturerUpdate.body).toHaveProperty("success", false);
+    });
+
+    it("it should create product of the manufacturer should response UnAuthorized with invalid token", async () => {
+        const productData = { name: "Product Manu" };
+
+        const productCreate = await request(BASE_URL)
+            .post(`/api/manufacturers/${manufacturerId}/product`)
+            .set("Authorization", `Bearer ${invalidToken}`)
+            .send(productData)
+            .expect(200);
+
+        expect(productCreate.body).toHaveProperty("success", false);
+    });
+
+    it("it should update the product should response UnAuthorized with invalid token", async () => {
+        const productData = { name: "Product 1" };
+
+        const productCreate = await request(BASE_URL)
+            .put(`/api/manufacturers/${manufacturerId}/product/${productId}`)
+            .set("Authorization", `Bearer ${invalidToken}`)
+            .send(productData)
+            .expect(200);
+
+        expect(productCreate.body).toHaveProperty("success", false);
+    });
+
+    it("it should delete the product should response UnAuthorized with invalid token", async () => {
+        const productDelete = await request(BASE_URL)
+            .delete(`/api/manufacturers/${manufacturerId}/product/${productId}`)
+            .set("Authorization", `Bearer ${invalidToken}`)
+            .expect(200);
+
+        expect(productDelete.body).toHaveProperty("success", false);
+    });
+
+    it("it should delete the manufacturer should response UnAuthorized with invalid token", async () => {
+        const manufacturerDelete = await request(BASE_URL)
+            .delete(`/api/manufacturers/${manufacturerId}`)
+            .set("Authorization", `Bearer ${invalidToken}`)
+            .expect(200);
+
+        expect(manufacturerDelete.body).toHaveProperty("success", false);
+    });
+});
+
 describe("Example test", () => {
     it("should pass", () => {
         expect(true).toBe(true);

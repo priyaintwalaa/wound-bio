@@ -176,6 +176,70 @@ describe("Patient Routes by companyAdmin", () => {
         expect(response.body.success).toBe(true);
     });
 });
+
+describe("Patient Routes with Invalid Token", () => {
+    const invalidToken = "invalid_token";
+
+    it("should return 401 Unauthorized when creating a new patient with an invalid token", async () => {
+        const newPatient = {
+            name: "John Great",
+            age: 30,
+            companyId: companyIdAdmin,
+        };
+
+        const response = await request(BASE_URL)
+            .post("/api/patients")
+            .set("Authorization", `Bearer ${invalidToken}`)
+            .send(newPatient)
+            .expect(401);
+
+        expect(response.body.success).toBe(false);
+    });
+
+    it("should return 401 Unauthorized when getting a patient with an invalid token", async () => {
+        const response = await request(BASE_URL)
+            .get(`/api/patients/${patientId}`)
+            .set("Authorization", `Bearer ${invalidToken}`)
+            .expect(401);
+
+        expect(response.body.success).toBe(false);
+    });
+
+    it("should return 401 Unauthorized when getting all patients with an invalid token", async () => {
+        const response = await request(BASE_URL)
+            .get(`/api/patients?companyId=${companyIdAdmin}`)
+            .set("Authorization", `Bearer ${invalidToken}`)
+            .expect(401);
+
+        expect(response.body.success).toBe(false);
+    });
+
+    it("should return 401 Unauthorized when updating a patient with an invalid token", async () => {
+        const updatedPatient = {
+            name: "Updated Patient",
+            age: 90,
+            companyId: companyIdAdmin,
+        };
+
+        const response = await request(BASE_URL)
+            .put(`/api/patients/${patientId}`)
+            .set("Authorization", `Bearer ${invalidToken}`)
+            .send(updatedPatient)
+            .expect(401);
+
+        expect(response.body.success).toBe(false);
+    });
+
+    it("should return 401 Unauthorized when deleting a patient with an invalid token", async () => {
+        const response = await request(BASE_URL)
+            .delete(`/api/patients/${patientId}`)
+            .set("Authorization", `Bearer ${invalidToken}`)
+            .expect(401);
+
+        expect(response.body.success).toBe(false);
+    });
+});
+
 describe("Example test", () => {
     it("should pass", () => {
         expect(true).toBe(true);
