@@ -12,7 +12,7 @@ describe("POST api for all /api/users", () => {
     beforeAll(async () => {
         const loginData = {
             email: "hello@bacancy.com",
-            password: "72c20ad0b4",
+            password: "ace08c5120",
         };
 
         const res = await request(BASE_URL)
@@ -40,6 +40,22 @@ describe("POST api for all /api/users", () => {
         expect(response.body).toHaveProperty("success", true);
         expect(response.body.data).toHaveProperty("role");
     }, 20000);
+
+    it("should return an error when the email already exists", async () => {
+        const userData = {
+            firstname: "John",
+            lastname: "Doe",
+            email: "hello@bacancy.com",
+        };
+
+        const response = await request(BASE_URL)
+            .post("/api/users/system-admin")
+            .set("x-api-key", adminKey)
+            .send(userData)
+            .expect(500);
+
+        expect(response.body).toHaveProperty("success", false);
+    });
 
     it("should return 401 Unauthorized with invalid x-api-key", async () => {
         const userData = {
@@ -94,11 +110,12 @@ describe("POST api for all /api/users", () => {
     });
 
     describe("POST /api/users", () => {
+        const email = "userfirst@ebacancy.com";
         it("should create a new user", async () => {
             const wuser = {
                 firstname: "kllek",
                 lastname: "kkel",
-                email: "userfirst@ebacancy.com",
+                email,
             };
             const response = await request(BASE_URL)
                 .post("/api/users")
@@ -110,6 +127,22 @@ describe("POST api for all /api/users", () => {
             expect(response.body.data).toHaveProperty("id");
             userId = response.body.data.id;
         },20000);
+
+        it("should return an error when the email already exists", async () => {
+            const userData = {
+                firstname: "John",
+                lastname: "Doe",
+                email,
+            };
+    
+            const response = await request(BASE_URL)
+                .post("/api/users")
+                .set("Authorization", `Bearer ${SuperAdminToken}`)
+                .send(userData)
+                .expect(500);
+    
+            expect(response.body).toHaveProperty("success", false);
+        });
     });
 
     describe("GET /api/users/:id", () => {
@@ -127,7 +160,6 @@ describe("POST api for all /api/users", () => {
             const response = await request(BASE_URL).get(
                 `/api/users/${nonExistentUserId}`
             );
-
             expect(response.body).toHaveProperty("success", false);
         });
     });
@@ -145,7 +177,6 @@ describe("POST api for all /api/users", () => {
                 .set("Authorization", `Bearer ${SuperAdminToken}`)
                 .send(updatedUser)
                 .expect(200);
-
             expect(response.body).toHaveProperty("success", true);
         });
 
@@ -156,7 +187,6 @@ describe("POST api for all /api/users", () => {
                 lastname: "Smith",
                 email: "janesmith@example.com",
             };
-
             const response = await request(BASE_URL)
                 .put(`/api/users/${nonExistentUserId}`)
                 .set("Authorization", `Bearer ${SuperAdminToken}`)
