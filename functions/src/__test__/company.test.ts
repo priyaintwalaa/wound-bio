@@ -9,19 +9,24 @@ let userId: string;
 let companyToken: string;
 let companyIdAdmin: string;
 let UserIdCompany: string;
+let OthercompanyId: string;
+// let otherCompanyToken:string;
+// let userIdOtherCompany:string;
 const loginData = {
     email: "hello@bacancy.com",
-    password: "ace08c5120",
+    password: "728b579941",
 };
 const companyLoginData = {
     email: "johndowswee@example.com",
-    password: "b2bbfe44c3",
+    password: "6dd074d193",
 };
+// const otherCompanyCred = {
+//     email:"company2@example.com",
+//     password:"26c5d442f6"
+// };
 
 describe("company API ", () => {
     beforeAll(async () => {
-      
-
         const res = await request(BASE_URL)
             .post("/api/auth/login")
             .send(loginData)
@@ -127,8 +132,6 @@ describe("Company Users with superAdmin token", () => {
 
 describe("Company Users with companyAdmin token", () => {
     beforeAll(async () => {
-       
-
         const res = await request(BASE_URL)
             .post("/api/auth/login")
             .send(companyLoginData)
@@ -145,7 +148,7 @@ describe("Company Users with companyAdmin token", () => {
             firstname: "Premium",
             lastname: "Doe",
             email: "companyuser@gmail.com",
-            companyIdAdmin,
+            companyId:companyIdAdmin,
             role: "user",
         };
         const response = await request(BASE_URL)
@@ -174,6 +177,8 @@ describe("Company Users with companyAdmin token", () => {
             firstname: "Jane",
             lastname: "Smith",
             email: "JaneSmith@example.com",
+            companyId:companyIdAdmin,
+            role: "user",
         };
 
         const response = await request(BASE_URL)
@@ -192,6 +197,108 @@ describe("Company Users with companyAdmin token", () => {
             .expect(200);
 
         expect(response.body).toHaveProperty("success", true);
+    });
+});
+
+describe("Authorised to companyAdmin owners", () => {
+    it("cannot create company with companyAdmin token", async () => {
+        const companyName = {
+            name: "not accessible",
+        };
+        const companyData = await request(BASE_URL)
+            .post("/api/companies")
+            .set("Authorization", `Bearer ${companyToken}`)
+            .send(companyName)
+            .expect(401);
+        expect(companyData.body).toHaveProperty("success", false);
+    });
+
+    it("cannot update a company with companyAdmin", async () => {
+        const updatedCompany = {
+            name: "Updated",
+        };
+        const response = await request(BASE_URL)
+            .put(`/api/companies/${companyIdAdmin}`)
+            .set("Authorization", `Bearer ${companyToken}`)
+            .send(updatedCompany)
+            .expect(401);
+
+        expect(response.body).toHaveProperty("success", false);
+    });
+
+    it("cannot delete a company with companyAdmin Token", async () => {
+        const response = await request(BASE_URL)
+            .delete(`/api/companies/${companyIdAdmin}`)
+            .set("Authorization", `Bearer ${companyToken}`)
+            .expect(401);
+
+        expect(response.body).toHaveProperty("success", false);
+    }, 20000);
+
+    it("create other company", async () => {
+        const companyName = {
+            name: "Other Company",
+        };
+
+        const companyData = await request(BASE_URL)
+            .post("/api/companies")
+            .set("Authorization", `Bearer ${token}`)
+            .send(companyName)
+            .expect(200);
+
+        expect(companyData.body).toHaveProperty("success", true);
+        expect(companyData.body.data).toHaveProperty("id");
+        OthercompanyId = companyData.body.data.id;
+    });
+    it("cannot get company details of other company", async () => {
+        const response = await request(BASE_URL)
+            .get(`/api/companies/${OthercompanyId}`)
+            .set("Authorization", `Bearer ${companyToken}`)
+            .expect(401);
+
+        expect(response.body).toHaveProperty("success", false);
+    });
+
+    it("cannot create a new company user in another company", async () => {
+        const newUser = {
+            firstname: "Premium",
+            lastname: "Doe",
+            email: "othercompanyuser@gmail.com",
+            OthercompanyId,
+            role: "user",
+        };
+        const response = await request(BASE_URL)
+            .post(`/api/companies/${OthercompanyId}/users`)
+            .set("Authorization", `Bearer ${companyToken}`)
+            .send(newUser)
+            .expect(401);
+
+        expect(response.body).toHaveProperty("success", false);
+    }, 20000);
+
+    it("cannot update a company user with different cred", async () => {
+        const updatedUser = {
+            firstname: "Jane",
+            lastname: "Smith",
+            email: "updateAnother@example.com",
+        };
+
+        const response = await request(BASE_URL)
+            .put(`/api/companies/${OthercompanyId}/users/${UserIdCompany}`)
+            .set("Authorization", `Bearer ${companyToken}`)
+            .send(updatedUser)
+            .expect(401);
+
+        expect(response.body).toHaveProperty("success", false);
+    });
+
+    it("cannot delete a company user of another company ", async () => {
+        const response = await request(BASE_URL)
+            .delete(`/api/companies/${OthercompanyId}/users/${UserIdCompany}`)
+            .set("Authorization", `Bearer ${companyToken}`)
+            .expect(401);
+
+        expect(response.body).toHaveProperty("success", false);
     });
 });
 

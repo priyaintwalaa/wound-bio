@@ -9,11 +9,11 @@ let authToken: string;
 let CompaniesId: string;
 const loginData = {
     email: "hello@bacancy.com",
-    password: "ace08c5120",
+    password: "728b579941",
 };
 const companyLoginData = {
     email: "johndowswee@example.com",
-    password: "b2bbfe44c3",
+    password: "6dd074d193",
 };
 describe("Patient Routes by systemadmin", () => {
     beforeAll(async () => {

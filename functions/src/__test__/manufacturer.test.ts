@@ -11,7 +11,7 @@ describe("Manufacturer and Product Routes", () => {
     beforeAll(async () => {
         const loginData = {
             email: "hello@bacancy.com",
-            password: "ace08c5120",
+            password: "728b579941",
         };
 
         const res = await request(BASE_URL)
@@ -161,7 +161,7 @@ describe("Invalid Token",()=>{
             .put(`/api/manufacturers/${manufacturerId}`)
             .set("Authorization", `Bearer ${invalidToken}`)
             .send({ name: "paracettemol" })
-            .expect(200);
+            .expect(401);
 
         expect(manufacturerUpdate.body).toHaveProperty("success", false);
     });
@@ -173,7 +173,7 @@ describe("Invalid Token",()=>{
             .post(`/api/manufacturers/${manufacturerId}/product`)
             .set("Authorization", `Bearer ${invalidToken}`)
             .send(productData)
-            .expect(200);
+            .expect(401);
 
         expect(productCreate.body).toHaveProperty("success", false);
     });
@@ -185,7 +185,7 @@ describe("Invalid Token",()=>{
             .put(`/api/manufacturers/${manufacturerId}/product/${productId}`)
             .set("Authorization", `Bearer ${invalidToken}`)
             .send(productData)
-            .expect(200);
+            .expect(401);
 
         expect(productCreate.body).toHaveProperty("success", false);
     });
@@ -194,7 +194,7 @@ describe("Invalid Token",()=>{
         const productDelete = await request(BASE_URL)
             .delete(`/api/manufacturers/${manufacturerId}/product/${productId}`)
             .set("Authorization", `Bearer ${invalidToken}`)
-            .expect(200);
+            .expect(401);
 
         expect(productDelete.body).toHaveProperty("success", false);
     });
@@ -203,7 +203,7 @@ describe("Invalid Token",()=>{
         const manufacturerDelete = await request(BASE_URL)
             .delete(`/api/manufacturers/${manufacturerId}`)
             .set("Authorization", `Bearer ${invalidToken}`)
-            .expect(200);
+            .expect(401);
 
         expect(manufacturerDelete.body).toHaveProperty("success", false);
     });

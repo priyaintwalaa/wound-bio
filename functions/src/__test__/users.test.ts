@@ -12,7 +12,7 @@ describe("POST api for all /api/users", () => {
     beforeAll(async () => {
         const loginData = {
             email: "hello@bacancy.com",
-            password: "ace08c5120",
+            password: "728b579941",
         };
 
         const res = await request(BASE_URL)
