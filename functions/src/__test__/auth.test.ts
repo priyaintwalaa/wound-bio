@@ -1,12 +1,13 @@
 import request from "supertest";
+import { TEST_CONSTANT } from "../constants/test_case.js";
 
 const BASE_URL = "http://127.0.0.1:5001/fir-functions-9c002/us-central1/wb";
 
 describe("Auth Route Api", () => {
     it("should login with correct credentials", async () => {
         const loginData = {
-            email: "hello@bacancy.com",
-            password: "728b579941",
+            email: TEST_CONSTANT.USER.LOGIN_SYSTEMADMIN.EMAIL,
+            password: TEST_CONSTANT.USER.LOGIN_SYSTEMADMIN.PASSWORD,
         };
 
         const res = await request(BASE_URL)
@@ -19,8 +20,8 @@ describe("Auth Route Api", () => {
 
     it("should login with incorrect credentials", async () => {
         const loginData = {
-            email: "invalid@bacancy.com",
-            password: "a66bd199ea",
+            email: TEST_CONSTANT.AUTH.INVALID_MAIL,
+            password: TEST_CONSTANT.USER.LOGIN_SYSTEMADMIN.PASSWORD,
         };
         const res = await request(BASE_URL)
             .post("/api/auth/login")
@@ -30,9 +31,9 @@ describe("Auth Route Api", () => {
         expect(res.body).toHaveProperty("success", false);
     });
 
-    it("forget password", async () => {
+    it("should get mail if clicked to forget password", async () => {
         const forgetSchema = {
-            email: "hello@bacancy.com",
+            email: TEST_CONSTANT.USER.LOGIN_SYSTEMADMIN.EMAIL,
         };
         const response = await request(BASE_URL)
             .post("/api/auth/forgot-password")
@@ -42,9 +43,9 @@ describe("Auth Route Api", () => {
         expect(response.body).toHaveProperty("success", true);
     },20000);
 
-    it("forget password with invalid email", async () => {
+    it("should get error if trying with invalid email for forget password", async () => {
         const forgetSchema = {
-            email: "invalid_email@bacancy.com",
+            email:TEST_CONSTANT.AUTH.INVALID_MAIL ,
         };
         const response = await request(BASE_URL)
             .post("/api/auth/forgot-password")

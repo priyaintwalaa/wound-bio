@@ -1,0 +1,99 @@
+export const TEST_CONSTANT = {
+    USER:{
+        LOGIN_SYSTEMADMIN :{
+            EMAIL:"hello@bacancy.com",
+            PASSWORD:"309fcd7d55",
+        },
+        CREATE_SYSTEMADMIN :{
+            FIRSTNAME:"first",
+            LASTNAME:"superadmin",
+            EMAIL:"firstSuper@bacancy.com",
+        },
+        CREATE_USER:{
+            FIRSTNAME:"first",
+            LASTNAME:"user",
+            EMAIL:"userfirst@bacancy.com",
+        },
+        UPDATE_CRED:{
+            EMAIL:"updating@bacanct.com"
+        },
+        INVALID_CRED:{
+            EMAIL:"invalid_email",
+            USERID:"invalid-user-id",
+        }
+    },
+    COMPANY:{
+        LOGIN_COMPANY_ADMIN:{
+            EMAIL:"johndowswee@example.com",
+            PASSWORD:"debdc9b2aa",
+        },
+        CREATE_COMPANY:{
+            NAME:"FULLERTON"
+        },
+        UPDATE_COMPANY:{
+            NAME:"CSU-FULLERTON"
+        },
+        SECOND_COMPANY:{
+            NAME:"LONG BEACH"
+        },
+        CREATE_COMPANY_ADMIN:{
+            FIRSTNAME:"first",
+            LASTNAME:"companyAdmin",
+            EMAIL:"firstcompanyadmin@bacancy.com",
+            ROLE:"companyadmin"
+        },
+        UPDATE_COMPANY_ADMIN:{
+            FIRSTNAME:"Update",
+            LASTNAME:"Companyadmin",
+            EMAIL:"updated@bacancy.com",
+        },
+        CREATE_COMPANY_USER:{
+            FIRSTNAME:"first",
+            LASTNAME:"companyUser",
+            EMAIL:"companyUser@bacancy.com",
+            ROLE:"user"
+        },
+        UPDATE_COMPANY_USER:{
+            FIRSTNAME:"update",
+            LASTNAME:"UpdatecompanyUser",
+            EMAIL:"UpdatecompanyUser@bacancy.com",
+            ROLE:"user"
+        },
+        SECOND_COMPANY_USER:{
+            FIRSTNAME:"second",
+            LASTNAME:"companyUser",
+            EMAIL:"secondcompanyUser@bacancy.com",
+            ROLE:"user"
+        }
+    },
+    MANUFACTURE:{
+        CREATE_NEW_MANUFACTURE:{
+            NAME:"cetemol"
+        },
+        UPDATE_MANUFACTURE:{
+            NAME:"paracetemol"
+        }
+    },
+    PRODUCT:{
+        CREATE_PRODUCT:{
+            NAME:"Product One"
+        },
+        UPDATE_PRODUCT:{
+            NAME:"Product Two"
+        }
+    },
+    PATIENT:{
+        CREATE_NEW_PATIENT:{
+            NAME:"FIRST PATIENT",
+            AGE:30,
+        },
+        UPDATE_PATIENT:{
+            NAME:"UPDATED PATIENT",
+            AGE:32,
+        }
+    },
+    AUTH:{
+        INVALID_MAIL:"invalid@bacancy.com",
+    }
+  
+};

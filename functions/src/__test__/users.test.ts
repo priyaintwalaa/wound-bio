@@ -2,33 +2,16 @@ import request from "supertest";
 
 const BASE_URL = "http://127.0.0.1:5001/fir-functions-9c002/us-central1/wb";
 const adminKey = process.env.SYSTEM_ADMIN_KEY;
-// // import { token as SuperAdminToken} from "./company.test.js";
 
-export let SuperAdminToken: string;
-export let userIdSuperadmin: string;
-
+import { SAdminToken as SuperAdminToken } from "./sum.test.js";
+import { TEST_CONSTANT } from "../constants/test_case.js";
 let userId: string;
 describe("POST api for all /api/users", () => {
-    beforeAll(async () => {
-        const loginData = {
-            email: "hello@bacancy.com",
-            password: "728b579941",
-        };
-
-        const res = await request(BASE_URL)
-            .post("/api/auth/login")
-            .send(loginData)
-            .expect(200);
-
-        expect(res.body).toHaveProperty("success", true);
-        SuperAdminToken = res.body.data.token;
-        userIdSuperadmin = res.body.data.user.id;
-    });
     it("should create a new system user and return with role", async () => {
         const nUser = {
-            firstname: "heell",
-            lastname: "heell",
-            email: "firstSuperrr@bacancy.com"
+            firstname: TEST_CONSTANT.USER.CREATE_SYSTEMADMIN.FIRSTNAME,
+            lastname: TEST_CONSTANT.USER.CREATE_SYSTEMADMIN.LASTNAME,
+            email: TEST_CONSTANT.USER.CREATE_SYSTEMADMIN.EMAIL
         };
 
         const response = await request(BASE_URL)
@@ -43,9 +26,9 @@ describe("POST api for all /api/users", () => {
 
     it("should return an error when the email already exists", async () => {
         const userData = {
-            firstname: "John",
-            lastname: "Doe",
-            email: "hello@bacancy.com",
+            firstname:TEST_CONSTANT.USER.CREATE_SYSTEMADMIN.FIRSTNAME,
+            lastname: TEST_CONSTANT.USER.CREATE_SYSTEMADMIN.LASTNAME,
+            email: TEST_CONSTANT.USER.LOGIN_SYSTEMADMIN.EMAIL,
         };
 
         const response = await request(BASE_URL)
@@ -59,9 +42,9 @@ describe("POST api for all /api/users", () => {
 
     it("should return 401 Unauthorized with invalid x-api-key", async () => {
         const userData = {
-            email: "mydata0704@gmail.com",
-            firstname: "John",
-            lastname: "Doe",
+            email: TEST_CONSTANT.USER.CREATE_USER.EMAIL,
+            firstname: TEST_CONSTANT.USER.CREATE_USER.FIRSTNAME,
+            lastname: TEST_CONSTANT.USER.CREATE_USER.LASTNAME,
         };
 
         const res = await request(BASE_URL)
@@ -75,9 +58,9 @@ describe("POST api for all /api/users", () => {
 
     it("should return 400 Bad Request with invalid email", async () => {
         const userData = {
-            email: "invalid-email",
-            firstname: "John",
-            lastname: "Doe",
+            email:  TEST_CONSTANT.USER.INVALID_CRED.EMAIL,
+            firstname: TEST_CONSTANT.USER.CREATE_USER.FIRSTNAME,
+            lastname: TEST_CONSTANT.USER.CREATE_USER.LASTNAME,
         };
 
         const res = await request(BASE_URL)
@@ -91,7 +74,7 @@ describe("POST api for all /api/users", () => {
 
     it("should return 400 Bad Request with missing fields", async () => {
         const userData = {
-            email: "mydata0704@gmail.com",
+            email:TEST_CONSTANT.USER.CREATE_USER.EMAIL,
         };
 
         const res = await request(BASE_URL)
@@ -110,12 +93,11 @@ describe("POST api for all /api/users", () => {
     });
 
     describe("POST /api/users", () => {
-        const email = "userfirst@ebacancy.com";
         it("should create a new user", async () => {
             const wuser = {
-                firstname: "kllek",
-                lastname: "kkel",
-                email,
+                email:  TEST_CONSTANT.USER.CREATE_USER.EMAIL,
+                firstname: TEST_CONSTANT.USER.CREATE_USER.FIRSTNAME,
+                lastname: TEST_CONSTANT.USER.CREATE_USER.LASTNAME,
             };
             const response = await request(BASE_URL)
                 .post("/api/users")
@@ -130,9 +112,9 @@ describe("POST api for all /api/users", () => {
 
         it("should return an error when the email already exists", async () => {
             const userData = {
-                firstname: "John",
-                lastname: "Doe",
-                email,
+                firstname:  TEST_CONSTANT.USER.CREATE_USER.FIRSTNAME,
+                lastname: TEST_CONSTANT.USER.CREATE_USER.LASTNAME,
+                email:TEST_CONSTANT.USER.CREATE_USER.EMAIL,
             };
     
             const response = await request(BASE_URL)
@@ -156,7 +138,7 @@ describe("POST api for all /api/users", () => {
         });
 
         it("should return an error when the user ID does not exist", async () => {
-            const nonExistentUserId = "invalid-user-id";
+            const nonExistentUserId = TEST_CONSTANT.USER.INVALID_CRED.USERID;
             const response = await request(BASE_URL).get(
                 `/api/users/${nonExistentUserId}`
             );
@@ -167,9 +149,9 @@ describe("POST api for all /api/users", () => {
     describe("PUT /api/users/:id", () => {
         it("should update a user", async () => {
             const updatedUser = {
-                firstname: "Jane",
-                lastname: "NGO",
-                email: "updating@example.com",
+                firstname:TEST_CONSTANT.USER.CREATE_USER.FIRSTNAME,
+                lastname:TEST_CONSTANT.USER.CREATE_USER.LASTNAME,
+                email:TEST_CONSTANT.USER.UPDATE_CRED.EMAIL,
             };
 
             const response = await request(BASE_URL)
@@ -181,11 +163,11 @@ describe("POST api for all /api/users", () => {
         });
 
         it("should return an error when the user ID does not exist", async () => {
-            const nonExistentUserId = "invalid-user-id";
+            const nonExistentUserId = TEST_CONSTANT.USER.INVALID_CRED.USERID;
             const updatedUser = {
-                firstname: "Jane",
-                lastname: "Smith",
-                email: "janesmith@example.com",
+                firstname:TEST_CONSTANT.USER.CREATE_USER.FIRSTNAME,
+                lastname:TEST_CONSTANT.USER.CREATE_USER.LASTNAME,
+                email:TEST_CONSTANT.USER.UPDATE_CRED.EMAIL,
             };
             const response = await request(BASE_URL)
                 .put(`/api/users/${nonExistentUserId}`)
@@ -205,15 +187,6 @@ describe("POST api for all /api/users", () => {
 
             expect(response.body).toHaveProperty("success", true);
         });
-        // it("should return an error when the user ID does not exist", async () => {
-        //     const nonExistentUserId = "invalid-user-id";
-
-        //     const response = await request(BASE_URL)
-        //         .delete(`/api/users/${nonExistentUserId}`)
-        //         .set("Authorization", `Bearer ${SuperAdminToken}`);
-
-        //     expect(response.body).toHaveProperty("success", true);
-        // });
     });
 });
 

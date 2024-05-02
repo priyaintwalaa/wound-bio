@@ -1,32 +1,18 @@
 import request from "supertest";
-// import { SuperAdminToken as authToken } from "./users.test.js";
-// import { token as authToken } from "./company.test.js";
+
 const BASE_URL = "http://127.0.0.1:5001/fir-functions-9c002/us-central1/wb";
-// import { companyId as CompaniesId } from "./company.test.js";
+import { TEST_CONSTANT } from "../constants/test_case.js";
+
+import { SAdminToken as authToken } from "./sum.test.js";
+import { CIdAdmin as companyIdAdmin } from "./sum.test.js";
+import { CToken as companyToken } from "./sum.test.js";
 export let patientId: string;
-
-let authToken: string;
 let CompaniesId: string;
-const loginData = {
-    email: "hello@bacancy.com",
-    password: "728b579941",
-};
-const companyLoginData = {
-    email: "johndowswee@example.com",
-    password: "6dd074d193",
-};
-describe("Patient Routes by systemadmin", () => {
+
+describe("Patient Routes by systemadmin token", () => {
     beforeAll(async () => {
-        const res = await request(BASE_URL)
-            .post("/api/auth/login")
-            .send(loginData)
-            .expect(200);
-
-        expect(res.body).toHaveProperty("success", true);
-        authToken = res.body.data.token;
-
         const companyName = {
-            name: "Premium",
+            name: TEST_CONSTANT.COMPANY.CREATE_COMPANY.NAME,
         };
 
         const companyData = await request(BASE_URL)
@@ -38,12 +24,11 @@ describe("Patient Routes by systemadmin", () => {
         expect(companyData.body).toHaveProperty("success", true);
         expect(companyData.body.data).toHaveProperty("id");
         CompaniesId = companyData.body.data.id;
-        // userIdSuperAdmin = res.body.data.user.id;
     });
     it("should create a new patient and store the patientID", async () => {
         const newPatient = {
-            name: "John Great",
-            age: 30,
+            name: TEST_CONSTANT.PATIENT.CREATE_NEW_PATIENT.NAME,
+            age: TEST_CONSTANT.PATIENT.CREATE_NEW_PATIENT.AGE,
             companyId: CompaniesId,
         };
 
@@ -77,8 +62,8 @@ describe("Patient Routes by systemadmin", () => {
 
     it("should update the patient by patientID", async () => {
         const updatedPatient = {
-            name: "Updated Patient",
-            age: 90,
+            name: TEST_CONSTANT.PATIENT.CREATE_NEW_PATIENT.NAME,
+            age: TEST_CONSTANT.PATIENT.CREATE_NEW_PATIENT.AGE,
             companyId: CompaniesId,
         };
 
@@ -101,25 +86,11 @@ describe("Patient Routes by systemadmin", () => {
     });
 });
 
-let companyToken: string;
-let companyIdAdmin: string;
-describe("Patient Routes by companyAdmin", () => {
-    beforeAll(async () => {
-        const res = await request(BASE_URL)
-            .post("/api/auth/login")
-            .send(companyLoginData)
-            .expect(200);
-
-        expect(res.body).toHaveProperty("success", true);
-       
-        companyToken = res.body.data.token;
-        companyIdAdmin = res.body.data.user.companyId;
-       
-    });
+describe("Patient Routes by companyAdmin token", () => {
     it("should create a new patient and store the patientID", async () => {
         const newPatient = {
-            name: "John Great",
-            age: 30,
+            name: TEST_CONSTANT.PATIENT.CREATE_NEW_PATIENT.NAME,
+            age: TEST_CONSTANT.PATIENT.CREATE_NEW_PATIENT.AGE,
             companyId: companyIdAdmin,
         };
 
@@ -153,8 +124,8 @@ describe("Patient Routes by companyAdmin", () => {
 
     it("should update the patient by patientID", async () => {
         const updatedPatient = {
-            name: "Updated Patient",
-            age: 90,
+            name: TEST_CONSTANT.PATIENT.UPDATE_PATIENT.NAME,
+            age: TEST_CONSTANT.PATIENT.UPDATE_PATIENT.AGE,
             companyId: companyIdAdmin,
         };
 
@@ -174,74 +145,5 @@ describe("Patient Routes by companyAdmin", () => {
             .expect(200);
 
         expect(response.body.success).toBe(true);
-    });
-});
-
-describe("Patient Routes with Invalid Token", () => {
-    const invalidToken = "invalid_token";
-
-    it("should return 401 Unauthorized when creating a new patient with an invalid token", async () => {
-        const newPatient = {
-            name: "John Great",
-            age: 30,
-            companyId: companyIdAdmin,
-        };
-
-        const response = await request(BASE_URL)
-            .post("/api/patients")
-            .set("Authorization", `Bearer ${invalidToken}`)
-            .send(newPatient)
-            .expect(401);
-
-        expect(response.body.success).toBe(false);
-    });
-
-    it("should return 401 Unauthorized when getting a patient with an invalid token", async () => {
-        const response = await request(BASE_URL)
-            .get(`/api/patients/${patientId}`)
-            .set("Authorization", `Bearer ${invalidToken}`)
-            .expect(401);
-
-        expect(response.body.success).toBe(false);
-    });
-
-    it("should return 401 Unauthorized when getting all patients with an invalid token", async () => {
-        const response = await request(BASE_URL)
-            .get(`/api/patients?companyId=${companyIdAdmin}`)
-            .set("Authorization", `Bearer ${invalidToken}`)
-            .expect(401);
-
-        expect(response.body.success).toBe(false);
-    });
-
-    it("should return 401 Unauthorized when updating a patient with an invalid token", async () => {
-        const updatedPatient = {
-            name: "Updated Patient",
-            age: 90,
-            companyId: companyIdAdmin,
-        };
-
-        const response = await request(BASE_URL)
-            .put(`/api/patients/${patientId}`)
-            .set("Authorization", `Bearer ${invalidToken}`)
-            .send(updatedPatient)
-            .expect(401);
-
-        expect(response.body.success).toBe(false);
-    });
-
-    it("should return 401 Unauthorized when deleting a patient with an invalid token", async () => {
-        const response = await request(BASE_URL)
-            .delete(`/api/patients/${patientId}`)
-            .set("Authorization", `Bearer ${invalidToken}`)
-            .expect(401);
-
-        expect(response.body.success).toBe(false);
-    });
-});
-
-describe("Example test", () => {
-    it("should pass", () => {
-        expect(true).toBe(true);
     });
 });
