@@ -4,7 +4,10 @@ import { Roles } from "../constants/enums.js";
 import { NextFunction, Response } from "express";
 import { ExtendedExpressRequest } from "../models/extendedExpressRequest.js";
 import { logger } from "firebase-functions";
+// import rateLimit from "express-rate-limit";
+import UserService from "../services/user.service.js";
 import { firebaseAuth } from "../config/firebase.config.js";
+import rateLimiter from "./ratelimit.middleware.js";
 
 export function verifyToken(
     req: ExtendedExpressRequest,
@@ -77,7 +80,7 @@ export const isCompanyAdmin = async (
 export const isSystemAdminOrCompanyAdmin = async (
     req: ExtendedExpressRequest,
     res: Response,
-    next: NextFunction,
+    next: NextFunction
 ) => {
     try {
         if (
@@ -86,7 +89,7 @@ export const isSystemAdminOrCompanyAdmin = async (
             req.user.role == Roles.SYSTEM_ADMIN
         ) {
             console.log("in if");
-            
+
             next();
         } else {
             next(new CustomError("Unauthorized", 401));
@@ -118,5 +121,52 @@ export const verifyFirebaseIdToken = async (req, res, next) => {
     } catch (e) {
         console.log(e);
         return res.status(401).json({ message: "Unauthorized" });
+    }
+};
+
+export const rateLimiting = async (
+    req: ExtendedExpressRequest,
+    res: Response,
+    next: NextFunction
+) => {
+    // rateLimit({
+    //     windowMs: 10 * 60 * 1000, //
+    //     max: 5, // maximum 5 attempts
+    //     handler: async () => {
+    //         try {
+    //             const userService = new UserService();
+    //             const user = await userService.getUserByEmail(req.body.email);
+    //             await userService.updateUser({...user, isLocked: true});
+    //             next(
+    //                 new CustomError(
+    //                     "Too many requests, your account is temporarily locked.",
+    //                     429
+    //                 )
+    //             );
+    //         } catch (error) {
+    //             console.error("Error updating user document:", error);
+    //             next(new CustomError("Internal Server Error", 500));
+    //         }
+    //     },
+    //     message: "Too many requests,Your account is temporarily locked. Please contact to Wound Bio group to unlock!",
+    // });
+    try {
+        await rateLimiter(req, res, next); // Use the rateLimiter instance
+    } catch (err) {
+        // Handle the rate limiting error
+        if (err.statusCode === 429) {
+            const userService = new UserService();
+            const user = await userService.getUserByEmail(req.body.email);
+            await userService.updateUser({ ...user, isLocked: true });
+            next(
+                new CustomError(
+                    "Too many requests, your account is temporarily locked. PLease contact Wound Biologics team to unlock",
+                    429
+                )
+            );
+        } else {
+            console.error("Error updating user document:", err);
+            next(new CustomError("Internal Server Error", 500));
+        }
     }
 };

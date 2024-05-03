@@ -24,25 +24,29 @@ export class AuthService {
         } catch (err: any) {
             throw new Error("INVALID_CREDS");
         }
-        const isUserAuthanticated = compareText(
-            password,
-            user.password.hash,
-            user.password.salt
-        );
-        if (!isUserAuthanticated) {
-            throw new Error("INVALID_CREDS");
-        }
-        const userMapper = new UserMapper();
-        const userResponse: UserResponse =
-            userMapper.generateUserResponse(user);
-        const token = jwt.sign(
-            userResponse,
-            process.env.JWT_SECRET_KEY as jwt.Secret,
-            {
-                expiresIn: "1h",
+        if (user.isLocked == false) {
+            const isUserAuthanticated = compareText(
+                password,
+                user.password.hash,
+                user.password.salt
+            );
+            if (!isUserAuthanticated) {
+                throw new Error("INVALID_CREDS");
             }
-        );
-        return { token, user: userResponse };
+            const userMapper = new UserMapper();
+            const userResponse: UserResponse =
+                userMapper.generateUserResponse(user);
+            const token = jwt.sign(
+                userResponse,
+                process.env.JWT_SECRET_KEY as jwt.Secret,
+                {
+                    expiresIn: "1h",
+                }
+            );
+            return { token, user: userResponse };
+        } else {
+            throw new Error("USER_LOCKED");
+        }
     };
 
     forgotPassword = async (email: string) => {
@@ -132,4 +136,40 @@ export class AuthService {
 
         return token;
     }
+
+    sendOtp = async (email: string) => {
+        const user: User = await this.userService.getUserByEmail(email);
+        if (!user) throw new Error("USER_NOT_REGISTERED");
+
+        const code = generateRandomText(5);
+
+        const emailService = new EmailService();
+        const mailOptions: any = {
+            to: user.email,
+            template: "verification-otp",
+            subject: "Verification OTP to Unlock your Wound Biologics account",
+            context: {
+                code,
+                firstname: user.firstname || "",
+                lastname: user.lastname || "",
+                expiryInMinutes: process.env.CODE_EXPIRTY_IN_MINUTES,
+            },
+        };
+        await emailService.sendMail(mailOptions);
+
+        await this.userService.updateUser({ ...user, otp: code });
+    };
+
+    verifyOtp = async (email: string, otp: string) => {
+        const user: User = await this.userService.getUserByEmail(email);
+        if (!user) throw new Error("USER_NOT_REGISTERED");
+
+        if (user.otp !== otp) throw new Error("INVALID_OTP");
+
+        await this.userService.updateUser({
+            ...user,
+            isLocked: false,
+            otp: null,
+        });
+    };
 }

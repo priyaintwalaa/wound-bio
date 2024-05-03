@@ -20,6 +20,8 @@ export interface User {
         expiredTime: Timestamp;
     };
     createdAt: FieldValue;
+    isLocked: boolean;
+    otp: string;
 }
 
 export type UserResponse = Omit<
