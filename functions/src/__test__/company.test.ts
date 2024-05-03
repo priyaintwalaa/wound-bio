@@ -1,41 +1,28 @@
 import request from "supertest";
-const BASE_URL = "http://127.0.0.1:5001/fir-functions-9c002/us-central1/wb";
-import { TEST_CONSTANT } from "../constants/test_case.js";
+import { TEST_CONSTANT } from "./test_case.js";
+const BASE_URL = TEST_CONSTANT.BASE_URL;
 
-// import { SAdminToken as token } from "./sum.test.js";
-// import { CIdAdmin as companyIdAdmin } from "./sum.test.js";
-// import { CToken as companyToken } from "./sum.test.js";
+import { loginUser } from "./getToken.js";
 
 export let companyId: string;
-export let token: string;
+let token: string;
 let userId: string;
 let companyToken: string;
 let companyIdAdmin: string;
 let UserIdCompany: string;
 let OthercompanyId: string;
 
-const loginData = {
-    email: TEST_CONSTANT.USER.LOGIN_SYSTEMADMIN.EMAIL,
-    password: TEST_CONSTANT.USER.LOGIN_SYSTEMADMIN.PASSWORD,
-};
-const companyLoginData = {
-    email: TEST_CONSTANT.COMPANY.LOGIN_COMPANY_ADMIN.EMAIL,
-    password: TEST_CONSTANT.COMPANY.LOGIN_COMPANY_ADMIN.PASSWORD,
-};
-
-describe("company API ", () => {
+describe("Company API Test Case", () => {
     beforeAll(async () => {
-        const res = await request(BASE_URL)
-            .post("/api/auth/login")
-            .send(loginData)
-            .expect(200);
-
-        expect(res.body).toHaveProperty("success", true);
-        token = res.body.data.token;
+        const res = await loginUser(
+            TEST_CONSTANT.USER.LOGIN_SYSTEMADMIN.EMAIL,
+            TEST_CONSTANT.USER.LOGIN_SYSTEMADMIN.PASSWORD
+        );
+        token = res.token;
     });
     it("return token for a valid user and create company", async () => {
         const companyName = {
-            name:TEST_CONSTANT.COMPANY.CREATE_COMPANY.NAME
+            name: TEST_CONSTANT.COMPANY.CREATE_COMPANY.NAME,
         };
 
         const companyData = await request(BASE_URL)
@@ -64,8 +51,8 @@ describe("company API ", () => {
     });
 });
 
-describe("Company Users with superAdmin token", () => {
-    it("should create a new company user POST /api/companies/:companyId/users", async () => {
+describe("Company Users accessible to stakeholders", () => {
+    it("should create a new company user", async () => {
         const newUser = {
             firstname: TEST_CONSTANT.COMPANY.CREATE_COMPANY_ADMIN.FIRSTNAME,
             lastname: TEST_CONSTANT.COMPANY.CREATE_COMPANY_ADMIN.LASTNAME,
@@ -84,7 +71,7 @@ describe("Company Users with superAdmin token", () => {
         userId = response.body.data.user.id;
     }, 20000);
 
-    it("should get a company by ID", async () => {
+    it("should get a company detials by ID", async () => {
         const response = await request(BASE_URL)
             .get(`/api/companies/${companyId}`)
             .set("Authorization", `Bearer ${token}`)
@@ -93,7 +80,7 @@ describe("Company Users with superAdmin token", () => {
         expect(response.body).toHaveProperty("success", true);
     });
 
-    it("should update a company user /api/companies/:companyId/users/:userId", async () => {
+    it("should update a company user", async () => {
         const updatedUser = {
             firstname: TEST_CONSTANT.COMPANY.UPDATE_COMPANY_ADMIN.FIRSTNAME,
             lastname: TEST_CONSTANT.COMPANY.UPDATE_COMPANY_ADMIN.LASTNAME,
@@ -109,7 +96,7 @@ describe("Company Users with superAdmin token", () => {
         expect(response.body).toHaveProperty("success", true);
     });
 
-    it("should delete a company user DELETE /api/companies/:companyId/users/:userId", async () => {
+    it("should delete a company user", async () => {
         const response = await request(BASE_URL)
             .delete(`/api/companies/${companyId}/users/${userId}`)
             .set("Authorization", `Bearer ${token}`)
@@ -128,25 +115,22 @@ describe("Company Users with superAdmin token", () => {
     }, 20000);
 });
 
-describe("Company Users with companyAdmin token", () => {
-    beforeAll(async () => {
-        const res = await request(BASE_URL)
-            .post("/api/auth/login")
-            .send(companyLoginData)
-            .expect(200);
-
-        expect(res.body).toHaveProperty("success", true);
-
-        companyToken = res.body.data.token;
-        companyIdAdmin = res.body.data.user.companyId;
+describe("Company Users accessible to company Owner", () => {
+    beforeAll(async()=>{
+        const res = await loginUser(
+            TEST_CONSTANT.COMPANY.LOGIN_COMPANY_ADMIN.EMAIL,
+            TEST_CONSTANT.COMPANY.LOGIN_COMPANY_ADMIN.PASSWORD
+        );
+        companyToken = res.token;
+        companyIdAdmin = res.user.companyId;
     });
 
-    it("should create a new company user POST /api/companies/:companyId/users with companyAdmin token", async () => {
+    it("should create a new company user", async () => {
         const newUser = {
             firstname: TEST_CONSTANT.COMPANY.CREATE_COMPANY_USER.FIRSTNAME,
             lastname: TEST_CONSTANT.COMPANY.CREATE_COMPANY_USER.LASTNAME,
             email: TEST_CONSTANT.COMPANY.CREATE_COMPANY_USER.EMAIL,
-            companyId:companyIdAdmin,
+            companyId: companyIdAdmin,
             role: TEST_CONSTANT.COMPANY.CREATE_COMPANY_USER.ROLE,
         };
         const response = await request(BASE_URL)
@@ -157,11 +141,10 @@ describe("Company Users with companyAdmin token", () => {
 
         expect(response.body).toHaveProperty("success", true);
         expect(response.body.data.user).toHaveProperty("id");
-        // userIdComapnyAdmin = response.body.data.user.id;
         UserIdCompany = response.body.data.user.id;
     }, 20000);
 
-    it("should get a company by ID", async () => {
+    it("should get a company details by ID", async () => {
         const response = await request(BASE_URL)
             .get(`/api/companies/${companyIdAdmin}`)
             .set("Authorization", `Bearer ${companyToken}`)
@@ -170,12 +153,12 @@ describe("Company Users with companyAdmin token", () => {
         expect(response.body).toHaveProperty("success", true);
     });
 
-    it("should update a company user /api/companies/:companyId/users/:userId", async () => {
+    it("should update a company user", async () => {
         const updatedUser = {
             firstname: TEST_CONSTANT.COMPANY.UPDATE_COMPANY_USER.FIRSTNAME,
             lastname: TEST_CONSTANT.COMPANY.UPDATE_COMPANY_USER.LASTNAME,
             email: TEST_CONSTANT.COMPANY.UPDATE_COMPANY_USER.EMAIL,
-            companyId:companyIdAdmin,
+            companyId: companyIdAdmin,
             role: TEST_CONSTANT.COMPANY.UPDATE_COMPANY_USER.ROLE,
         };
 
@@ -188,7 +171,7 @@ describe("Company Users with companyAdmin token", () => {
         expect(response.body).toHaveProperty("success", true);
     });
 
-    it("should delete a company user DELETE /api/companies/:companyId/users/:userId", async () => {
+    it("should delete a company user", async () => {
         const response = await request(BASE_URL)
             .delete(`/api/companies/${companyIdAdmin}/users/${UserIdCompany}`)
             .set("Authorization", `Bearer ${companyToken}`)
@@ -198,8 +181,8 @@ describe("Company Users with companyAdmin token", () => {
     });
 });
 
-describe("Authorised to companyAdmin owners", () => {
-    it("cannot create company with companyAdmin token", async () => {
+describe("Authorised to company owners", () => {
+    it("should not create company by company owner", async () => {
         const companyName = {
             name: TEST_CONSTANT.COMPANY.CREATE_COMPANY.NAME,
         };
@@ -211,7 +194,7 @@ describe("Authorised to companyAdmin owners", () => {
         expect(companyData.body).toHaveProperty("success", false);
     });
 
-    it("cannot update a company with companyAdmin", async () => {
+    it("should not update a companyby company owner", async () => {
         const updatedCompany = {
             name: TEST_CONSTANT.COMPANY.UPDATE_COMPANY.NAME,
         };
@@ -224,7 +207,7 @@ describe("Authorised to companyAdmin owners", () => {
         expect(response.body).toHaveProperty("success", false);
     });
 
-    it("cannot delete a company with companyAdmin Token", async () => {
+    it("should not delete a company by company owner", async () => {
         const response = await request(BASE_URL)
             .delete(`/api/companies/${companyIdAdmin}`)
             .set("Authorization", `Bearer ${companyToken}`)
@@ -248,7 +231,7 @@ describe("Authorised to companyAdmin owners", () => {
         expect(companyData.body.data).toHaveProperty("id");
         OthercompanyId = companyData.body.data.id;
     });
-    it("cannot get company details of other company", async () => {
+    it("should not get company details of other company", async () => {
         const response = await request(BASE_URL)
             .get(`/api/companies/${OthercompanyId}`)
             .set("Authorization", `Bearer ${companyToken}`)
@@ -257,13 +240,13 @@ describe("Authorised to companyAdmin owners", () => {
         expect(response.body).toHaveProperty("success", false);
     });
 
-    it("cannot create a new company user in another company", async () => {
+    it("should not create a new company user in another company", async () => {
         const newUser = {
             firstname: TEST_CONSTANT.COMPANY.SECOND_COMPANY_USER.FIRSTNAME,
-            lastname:  TEST_CONSTANT.COMPANY.SECOND_COMPANY_USER.LASTNAME,
-            email:  TEST_CONSTANT.COMPANY.SECOND_COMPANY_USER.EMAIL,
-            companyId:OthercompanyId,
-            role:  TEST_CONSTANT.COMPANY.SECOND_COMPANY_USER.ROLE,
+            lastname: TEST_CONSTANT.COMPANY.SECOND_COMPANY_USER.LASTNAME,
+            email: TEST_CONSTANT.COMPANY.SECOND_COMPANY_USER.EMAIL,
+            companyId: OthercompanyId,
+            role: TEST_CONSTANT.COMPANY.SECOND_COMPANY_USER.ROLE,
         };
         const response = await request(BASE_URL)
             .post(`/api/companies/${OthercompanyId}/users`)
@@ -274,11 +257,11 @@ describe("Authorised to companyAdmin owners", () => {
         expect(response.body).toHaveProperty("success", false);
     }, 20000);
 
-    it("cannot update a FIRST company user with SECOND COMPANY CREDENTIAL", async () => {
+    it("should not update a FIRST company user with SECOND COMPANY owner", async () => {
         const updatedUser = {
             firstname: TEST_CONSTANT.COMPANY.SECOND_COMPANY_USER.FIRSTNAME,
-            lastname:  TEST_CONSTANT.COMPANY.SECOND_COMPANY_USER.LASTNAME,
-            email:  TEST_CONSTANT.COMPANY.SECOND_COMPANY_USER.EMAIL,
+            lastname: TEST_CONSTANT.COMPANY.SECOND_COMPANY_USER.LASTNAME,
+            email: TEST_CONSTANT.COMPANY.SECOND_COMPANY_USER.EMAIL,
         };
 
         const response = await request(BASE_URL)
@@ -290,7 +273,7 @@ describe("Authorised to companyAdmin owners", () => {
         expect(response.body).toHaveProperty("success", false);
     });
 
-    it("cannot delete a company user of another company ", async () => {
+    it("should not delete a company user of another company ", async () => {
         const response = await request(BASE_URL)
             .delete(`/api/companies/${OthercompanyId}/users/${UserIdCompany}`)
             .set("Authorization", `Bearer ${companyToken}`)

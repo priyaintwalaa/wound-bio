@@ -1,12 +1,21 @@
 import request from "supertest";
 
-const BASE_URL = "http://127.0.0.1:5001/fir-functions-9c002/us-central1/wb";
+import { TEST_CONSTANT } from "./test_case.js";
 const adminKey = process.env.SYSTEM_ADMIN_KEY;
+const BASE_URL = TEST_CONSTANT.BASE_URL;
 
-import { SAdminToken as SuperAdminToken } from "./sum.test.js";
-import { TEST_CONSTANT } from "../constants/test_case.js";
+// import { SAdminToken as SuperAdminToken } from "./sum.test.js";
+import { loginUser } from "./getToken.js";
+let SuperAdminToken:string;
 let userId: string;
-describe("POST api for all /api/users", () => {
+describe("User Routes", () => {
+    beforeAll(async () => {
+        const res = await loginUser(
+            TEST_CONSTANT.USER.LOGIN_SYSTEMADMIN.EMAIL,
+            TEST_CONSTANT.USER.LOGIN_SYSTEMADMIN.PASSWORD
+        );
+        SuperAdminToken = res.token;
+    });
     it("should create a new system user and return with role", async () => {
         const nUser = {
             firstname: TEST_CONSTANT.USER.CREATE_SYSTEMADMIN.FIRSTNAME,
@@ -92,7 +101,7 @@ describe("POST api for all /api/users", () => {
         );
     });
 
-    describe("POST /api/users", () => {
+    describe("Create User", () => {
         it("should create a new user", async () => {
             const wuser = {
                 email:  TEST_CONSTANT.USER.CREATE_USER.EMAIL,
@@ -127,7 +136,7 @@ describe("POST api for all /api/users", () => {
         });
     });
 
-    describe("GET /api/users/:id", () => {
+    describe("GET User", () => {
         it("should get a user by ID", async () => {
             const response = await request(BASE_URL)
                 .get(`/api/users/${userId}`)
@@ -146,7 +155,7 @@ describe("POST api for all /api/users", () => {
         });
     });
 
-    describe("PUT /api/users/:id", () => {
+    describe("Update User", () => {
         it("should update a user", async () => {
             const updatedUser = {
                 firstname:TEST_CONSTANT.USER.CREATE_USER.FIRSTNAME,
@@ -178,7 +187,7 @@ describe("POST api for all /api/users", () => {
         });
     });
 
-    describe("DELETE /api/users/:id", () => {
+    describe("Delete Api", () => {
         it("should delete a user", async () => {
             const response = await request(BASE_URL)
                 .delete(`/api/users/${userId}`)
@@ -187,11 +196,5 @@ describe("POST api for all /api/users", () => {
 
             expect(response.body).toHaveProperty("success", true);
         });
-    });
-});
-
-describe("Example test", () => {
-    it("should pass", () => {
-        expect(true).toBe(true);
     });
 });

@@ -1,11 +1,20 @@
 import request from "supertest";
-import { TEST_CONSTANT } from "../constants/test_case.js";
+import { TEST_CONSTANT } from "./test_case.js";
 const BASE_URL = "http://127.0.0.1:5001/fir-functions-9c002/us-central1/wb";
-import { SAdminToken as UserToken } from "./sum.test.js";
+// import { SAdminToken as UserToken } from "./sum.test.js";
+import { loginUser } from "./getToken.js";
 
 let manufacturerId: string;
 let productId: string;
+let UserToken: string;
 describe("Manufacturer and Product Routes", () => {
+    beforeAll(async () => {
+        const res = await loginUser(
+            TEST_CONSTANT.USER.LOGIN_SYSTEMADMIN.EMAIL,
+            TEST_CONSTANT.USER.LOGIN_SYSTEMADMIN.PASSWORD
+        );
+        UserToken = res.token;
+    });
     it("it should create a new manufacturer", async () => {
         const manufacturer = {
             name: TEST_CONSTANT.MANUFACTURE.CREATE_NEW_MANUFACTURE.NAME,
@@ -21,7 +30,7 @@ describe("Manufacturer and Product Routes", () => {
         manufacturerId = manufacturerCreate.body.data.id;
     });
 
-    it("update the manufacturer", async () => {
+    it("should update the manufacturer", async () => {
         const manufacturer = {
             name: TEST_CONSTANT.MANUFACTURE.UPDATE_MANUFACTURE.NAME,
         };

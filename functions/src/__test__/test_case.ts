@@ -1,8 +1,9 @@
 export const TEST_CONSTANT = {
+    BASE_URL:"http://127.0.0.1:5001/fir-functions-9c002/us-central1/wb",
     USER:{
         LOGIN_SYSTEMADMIN :{
             EMAIL:"hello@bacancy.com",
-            PASSWORD:"309fcd7d55",
+            PASSWORD:"c4d7eae3fe",
         },
         CREATE_SYSTEMADMIN :{
             FIRSTNAME:"first",
@@ -25,7 +26,7 @@ export const TEST_CONSTANT = {
     COMPANY:{
         LOGIN_COMPANY_ADMIN:{
             EMAIL:"johndowswee@example.com",
-            PASSWORD:"debdc9b2aa",
+            PASSWORD:"50e95e90fe",
         },
         CREATE_COMPANY:{
             NAME:"FULLERTON"

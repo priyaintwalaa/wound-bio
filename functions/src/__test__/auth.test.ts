@@ -1,5 +1,5 @@
 import request from "supertest";
-import { TEST_CONSTANT } from "../constants/test_case.js";
+import { TEST_CONSTANT } from "./test_case.js";
 
 const BASE_URL = "http://127.0.0.1:5001/fir-functions-9c002/us-central1/wb";
 
@@ -18,7 +18,7 @@ describe("Auth Route Api", () => {
         expect(res.body).toHaveProperty("success", true);
     });
 
-    it("should login with incorrect credentials", async () => {
+    it("should not login with incorrect credentials", async () => {
         const loginData = {
             email: TEST_CONSTANT.AUTH.INVALID_MAIL,
             password: TEST_CONSTANT.USER.LOGIN_SYSTEMADMIN.PASSWORD,

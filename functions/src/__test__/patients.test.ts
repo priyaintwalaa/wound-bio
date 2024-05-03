@@ -1,16 +1,34 @@
 import request from "supertest";
 
 const BASE_URL = "http://127.0.0.1:5001/fir-functions-9c002/us-central1/wb";
-import { TEST_CONSTANT } from "../constants/test_case.js";
-
-import { SAdminToken as authToken } from "./sum.test.js";
-import { CIdAdmin as companyIdAdmin } from "./sum.test.js";
-import { CToken as companyToken } from "./sum.test.js";
+import { TEST_CONSTANT } from "./test_case.js";
+//
+// import { SAdminToken as authToken } from "./sum.test.js";
+// import { CIdAdmin as companyIdAdmin } from "./sum.test.js";
+// import { CToken as companyToken } from "./sum.test.js";
+import { loginUser } from "./getToken.js";
 export let patientId: string;
 let CompaniesId: string;
+let authToken: string;
+let companyIdAdmin: string;
+let companyToken: string;
 
-describe("Patient Routes by systemadmin token", () => {
+describe("Patient Routes", () => {
     beforeAll(async () => {
+        const res = await loginUser(
+            TEST_CONSTANT.USER.LOGIN_SYSTEMADMIN.EMAIL,
+            TEST_CONSTANT.USER.LOGIN_SYSTEMADMIN.PASSWORD
+        );
+        authToken = res.token;
+
+        const response = await loginUser(
+            TEST_CONSTANT.COMPANY.LOGIN_COMPANY_ADMIN.EMAIL,
+            TEST_CONSTANT.COMPANY.LOGIN_COMPANY_ADMIN.PASSWORD
+        );
+
+        companyToken = response.token;
+        companyIdAdmin = response.user.companyId;
+
         const companyName = {
             name: TEST_CONSTANT.COMPANY.CREATE_COMPANY.NAME,
         };
@@ -51,7 +69,7 @@ describe("Patient Routes by systemadmin token", () => {
         expect(response.body.success).toBe(true);
     });
 
-    it("should get all patient of particular companyID", async () => {
+    it("should get all patient of particular company by companyId", async () => {
         const response = await request(BASE_URL)
             .get(`/api/patients?companyId=${CompaniesId}`)
             .set("Authorization", `Bearer ${authToken}`)
@@ -86,7 +104,7 @@ describe("Patient Routes by systemadmin token", () => {
     });
 });
 
-describe("Patient Routes by companyAdmin token", () => {
+describe("Patient Routes by company Owner", () => {
     it("should create a new patient and store the patientID", async () => {
         const newPatient = {
             name: TEST_CONSTANT.PATIENT.CREATE_NEW_PATIENT.NAME,
@@ -138,7 +156,7 @@ describe("Patient Routes by companyAdmin token", () => {
         expect(response.body.success).toBe(true);
     });
 
-    it("should delete the patient by  patientID", async () => {
+    it("should delete the patient by patientID", async () => {
         const response = await request(BASE_URL)
             .delete(`/api/patients/${patientId}`)
             .set("Authorization", `Bearer ${companyToken}`)
