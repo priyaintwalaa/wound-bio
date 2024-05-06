@@ -22,7 +22,7 @@ export class AuthService {
         try {
             user = await this.userService.getUserByEmail(email);
         } catch (err: any) {
-            await this.updateLoginAttempts(user);
+            // await this.updateLoginAttempts(user);
             throw new Error("INVALID_CREDS");
         }
 
