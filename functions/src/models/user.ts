@@ -22,10 +22,6 @@ export interface User {
     createdAt: FieldValue;
     isLocked: boolean;
     loginAttempts: number;
-    otp:{
-        code:string;
-        expiredTime:Timestamp;
-    }
 }
 
 export type UserResponse = Omit<

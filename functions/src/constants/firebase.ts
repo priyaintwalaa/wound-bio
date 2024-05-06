@@ -9,5 +9,6 @@ export const FIREBASE_CONSTANTS = {
         ORDERS_STATUS_HISTORY: "ordersStatusHistory",
         PATIENTS: "patients",
         COUNTERS: "counters",
+        OTP:"otp",
     },
 };

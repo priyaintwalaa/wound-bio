@@ -9,12 +9,15 @@ import UserService from "./user.service.js";
 import jwt from "jsonwebtoken";
 import { UserMapper } from "../mappers/user.mapper.js";
 import EmailService from "./email.service.js";
+import OptService from "./otp.service.js";
 
 export class AuthService {
     private userService: UserService;
+    private otpService: OptService;
 
     constructor() {
         this.userService = new UserService();
+        this.otpService = new OptService();
     }
 
     login = async (email: string, password: string) => {
@@ -22,11 +25,10 @@ export class AuthService {
         try {
             user = await this.userService.getUserByEmail(email);
         } catch (err: any) {
-            await this.updateLoginAttempts(user);
             throw new Error("INVALID_CREDS");
         }
 
-        if(user.loginAttempts > 3 || user.isLocked){
+        if (user.loginAttempts > 3 || user.isLocked) {
             throw new Error("USER_LOCKED");
         }
 
@@ -186,16 +188,21 @@ export class AuthService {
             now.nanoseconds
         );
 
-        await this.userService.updateUser({ ...user, otp: {code , expiredTime: thirtyMinutesFromNow}});
+        await this.otpService.createOtp({
+            email,
+            otp: code,
+            expiredTime: thirtyMinutesFromNow,
+        });
     };
 
     verifyOtp = async (email: string, otp: string) => {
+        const latestOtp = await this.otpService.getLatestOtpByEmail(email);
+        if(latestOtp.otp !== otp) throw new Error("INVALID_OTP");
+
         const user: User = await this.userService.getUserByEmail(email);
         if (!user) throw new Error("USER_NOT_REGISTERED");
 
-        if (user.otp.code !== otp) throw new Error("INVALID_OTP");
-
-        const expiredTime = user.otp.expiredTime;
+        const expiredTime = latestOtp.expiredTime;
         const now = Timestamp.now();
 
         if(expiredTime.seconds < now.seconds){
@@ -206,10 +213,6 @@ export class AuthService {
             ...user,
             isLocked: false,
             loginAttempts: 0,
-            otp: {
-                code:null,
-                expiredTime:null
-            },
         });
     };
 }
