@@ -1,4 +1,4 @@
-import { Timestamp } from "firebase-admin/firestore";
+import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { User, UserResponse } from "../models/user.js";
 import {
     compareText,
@@ -28,7 +28,8 @@ export class AuthService {
             throw new Error("INVALID_CREDS");
         }
 
-        if (user.loginAttempts > 3 || user.isLocked) {
+        const number = +process.env.MAXIMUM_LOGIN_ATTEMPTS;
+        if (user.loginAttempts > number || user.isLocked) {
             throw new Error("USER_LOCKED");
         }
 
@@ -147,7 +148,9 @@ export class AuthService {
         let attempts = userData.loginAttempts;
         attempts++;
 
-        if (attempts >= 3) {
+
+        const number = +process.env.MAXIMUM_LOGIN_ATTEMPTS;
+        if (attempts >= number) {
             await this.userService.updateUser({
                 ...userData,
                 isLocked: true,
@@ -192,15 +195,16 @@ export class AuthService {
             email,
             otp: code,
             expiredTime: thirtyMinutesFromNow,
+            createdAt: FieldValue.serverTimestamp(),
         });
     };
 
     verifyOtp = async (email: string, otp: string) => {
-        const latestOtp = await this.otpService.getLatestOtpByEmail(email);
-        if(latestOtp.otp !== otp) throw new Error("INVALID_OTP");
-
         const user: User = await this.userService.getUserByEmail(email);
         if (!user) throw new Error("USER_NOT_REGISTERED");
+
+        const latestOtp = await this.otpService.getLatestOtpByEmail(email);
+        if(latestOtp.otp !== otp) throw new Error("INVALID_OTP");
 
         const expiredTime = latestOtp.expiredTime;
         const now = Timestamp.now();

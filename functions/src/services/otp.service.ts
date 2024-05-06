@@ -1,4 +1,4 @@
-import { Otp } from "../models/otp.js";
+import { Otp, OtpResponse } from "../models/otp.js";
 import { firebaseDB } from "../config/firebase.config.js";
 import { FIREBASE_CONSTANTS } from "../constants/firebase.js";
 
@@ -15,7 +15,7 @@ export default class OptService {
     getLatestOtpByEmail = async (email: string) => {
         const querySnapshot = await otpCollection
             .where("email", "==", email)
-            .orderBy("expiredTime", "desc")
+            .orderBy("createdAt", "desc")
             .limit(1)
             .get();
 
@@ -24,10 +24,11 @@ export default class OptService {
         }
 
         const latestOtpDoc = querySnapshot.docs[0];
-        const latestOtp: Otp = {
-            email: latestOtpDoc.data().email,
-            otp: latestOtpDoc.data().otp,
-            expiredTime: latestOtpDoc.data().expiredTime,
+        const data = latestOtpDoc.data();
+        const latestOtp: OtpResponse = {
+            email: data.email,
+            otp: data.otp,
+            expiredTime: data.expiredTime,
         };
 
         return latestOtp;
