@@ -42,16 +42,16 @@ export class UserController {
 
     createSystemAdmin = asyncHandler(async (req: Request, res: Response) => {
         //Step1: Allow only if have valid API key to create system admin
-        console.log(req.body, "createSystemAdmin");
+        // console.log(req.body, "createSystemAdmin");
         if (req.headers["x-api-key"] != process.env.SYSTEM_ADMIN_KEY) {
             throw new CustomError("Unauthorized", 401);
         }
         //Step2: Add system admin in DB
         const user: User = req.body;
         user.role = Roles.SYSTEM_ADMIN;
-        console.log("Creating user:", user);
+        // console.log("Creating user:", user);
         const { password } = await this.userService.createUser(user);
-        console.log("User created with password:", password);
+        // console.log("User created with password:", password);
         //Step3: Send email with temp creds to system admin email
         await this.userService.sendCredsEmailToUser({
             firstname: user.firstname,
@@ -59,11 +59,11 @@ export class UserController {
             toEmailAddress: user.email,
             password,
         });
-        console.log("Email sent to user:", user.email);
+        // console.log("Email sent to user:", user.email);
         const userMapper = new UserMapper();
         const userResponse = userMapper.generateUserResponse(user);
 
-        console.log("User response:", userResponse);
+        // console.log("User response:", userResponse);
         
         return res
             .status(200)

@@ -58,6 +58,7 @@ export default class UserService {
         user.password = { hash: hashedText, salt };
         const docRef = await usersCollection.add({
             ...user,
+            loginAttempts:0,
             isLocked:false,
             isActive: true,
             createdAt: FieldValue.serverTimestamp(),

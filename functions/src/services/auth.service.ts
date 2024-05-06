@@ -22,31 +22,35 @@ export class AuthService {
         try {
             user = await this.userService.getUserByEmail(email);
         } catch (err: any) {
+            await this.updateLoginAttempts(user);
             throw new Error("INVALID_CREDS");
         }
-        if (user.isLocked == false) {
-            const isUserAuthanticated = compareText(
-                password,
-                user.password.hash,
-                user.password.salt
-            );
-            if (!isUserAuthanticated) {
-                throw new Error("INVALID_CREDS");
-            }
-            const userMapper = new UserMapper();
-            const userResponse: UserResponse =
-                userMapper.generateUserResponse(user);
-            const token = jwt.sign(
-                userResponse,
-                process.env.JWT_SECRET_KEY as jwt.Secret,
-                {
-                    expiresIn: "1h",
-                }
-            );
-            return { token, user: userResponse };
-        } else {
+
+        if(user.loginAttempts > 3 || user.isLocked){
             throw new Error("USER_LOCKED");
         }
+
+        const isUserAuthanticated = compareText(
+            password,
+            user.password.hash,
+            user.password.salt
+        );
+        if (!isUserAuthanticated) {
+            await this.updateLoginAttempts(user);
+            throw new Error("INVALID_CREDS");
+        }
+
+        const userMapper = new UserMapper();
+        const userResponse: UserResponse =
+            userMapper.generateUserResponse(user);
+        const token = jwt.sign(
+            userResponse,
+            process.env.JWT_SECRET_KEY as jwt.Secret,
+            {
+                expiresIn: "1h",
+            }
+        );
+        return { token, user: userResponse };
     };
 
     forgotPassword = async (email: string) => {
@@ -137,6 +141,24 @@ export class AuthService {
         return token;
     }
 
+    updateLoginAttempts = async (userData: User) => {
+        let attempts = userData.loginAttempts;
+        attempts++;
+
+        if (attempts >= 3) {
+            await this.userService.updateUser({
+                ...userData,
+                isLocked: true,
+                loginAttempts: attempts,
+            });
+        } else {
+            await this.userService.updateUser({
+                ...userData,
+                loginAttempts: attempts,
+            });
+        }
+    };
+
     sendOtp = async (email: string) => {
         const user: User = await this.userService.getUserByEmail(email);
         if (!user) throw new Error("USER_NOT_REGISTERED");
@@ -157,19 +179,37 @@ export class AuthService {
         };
         await emailService.sendMail(mailOptions);
 
-        await this.userService.updateUser({ ...user, otp: code });
+        const now = Timestamp.now();
+        const thirtyMinutesFromNow = new Timestamp(
+            now.seconds +
+                (Number(process.env.CODE_EXPIRTY_IN_MINUTES) / 60) * 60 * 60,
+            now.nanoseconds
+        );
+
+        await this.userService.updateUser({ ...user, otp: {code , expiredTime: thirtyMinutesFromNow}});
     };
 
     verifyOtp = async (email: string, otp: string) => {
         const user: User = await this.userService.getUserByEmail(email);
         if (!user) throw new Error("USER_NOT_REGISTERED");
 
-        if (user.otp !== otp) throw new Error("INVALID_OTP");
+        if (user.otp.code !== otp) throw new Error("INVALID_OTP");
+
+        const expiredTime = user.otp.expiredTime;
+        const now = Timestamp.now();
+
+        if(expiredTime.seconds < now.seconds){
+            throw new Error("EXPIRED_CODE");
+        }
 
         await this.userService.updateUser({
             ...user,
             isLocked: false,
-            otp: null,
+            loginAttempts: 0,
+            otp: {
+                code:null,
+                expiredTime:null
+            },
         });
     };
 }
